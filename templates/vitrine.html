@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Produtos{% endblock %}
+{% block conteudo %}
+<h1>Produtos impressos em 3D</h1>
+<form class="busca">
+  <input name="busca" value="{{ busca }}" placeholder="Pesquisar produto...">
+  <button>Pesquisar</button>
+</form>
+<div class="grade">
+  {% for produto in produtos %}
+  <div class="cartao">
+    <h3>{{ produto.nome }}</h3>
+    <p>{{ produto.descricao }}</p>
+    <p class="preco">{{ produto.preco | dinheiro }}</p>
+    {% set qtd = produto.estoque.consultar_quantidade() %}
+    <p class="detalhe">{{ qtd }} em estoque</p>
+    {% if usuario and not usuario.eh_administrador() and qtd > 0 %}
+      <form method="post" action="/carrinho/adicionar" class="linha">
+        <input type="hidden" name="produto_id" value="{{ produto.id }}">
+        <input type="number" name="quantidade" value="1" min="1" class="pequeno">
+        <button>Adicionar ao carrinho</button>
+      </form>
+    {% elif not usuario %}
+      <a href="/login">Entre para comprar</a>
+    {% elif qtd == 0 %}
+      <p class="detalhe">Esgotado</p>
+    {% endif %}
+  </div>
+  {% else %}
+  <p>Nenhum produto encontrado.</p>
+  {% endfor %}
+</div>
+{% endblock %}

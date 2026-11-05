@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Criar conta{% endblock %}
+{% block conteudo %}
+<h1>Criar conta</h1>
+<form method="post" class="cartao formulario">
+  <label>Nome <input name="nome"></label>
+  <label>E-mail <input name="email"></label>
+  <label>Senha (mínimo 4 caracteres) <input type="password" name="senha"></label>
+  <label>CPF (11 dígitos) <input name="cpf"></label>
+  <label>Telefone <input name="telefone"></label>
+  <label>Endereço de entrega <input name="endereco"></label>
+  <button>Cadastrar</button>
+</form>
+{% endblock %}

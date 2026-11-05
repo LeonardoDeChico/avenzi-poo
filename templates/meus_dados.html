@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Meus dados{% endblock %}
+{% block conteudo %}
+<h1>Meus dados</h1>
+<form method="post" class="cartao formulario">
+  <label>Nome <input name="nome" value="{{ usuario.nome }}"></label>
+  <label>E-mail <input name="email" value="{{ usuario.email }}"></label>
+  <label>Nova senha (deixe em branco para manter) <input type="password" name="nova_senha"></label>
+  <button>Salvar</button>
+</form>
+{% endblock %}

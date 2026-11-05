@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Produto{% endblock %}
+{% block conteudo %}
+<h1>{{ 'Alterar produto' if produto else 'Novo produto' }}</h1>
+<form method="post" action="/admin/produto/salvar" class="cartao formulario">
+  <input type="hidden" name="id" value="{{ produto.id if produto else '' }}">
+  <label>Nome <input name="nome" value="{{ produto.nome if produto else '' }}"></label>
+  <label>Descrição <input name="descricao" value="{{ produto.descricao if produto else '' }}"></label>
+  <label>Preço (R$) <input name="preco" value="{{ '%.2f' | format(produto.preco) if produto else '' }}"></label>
+  <label>Quantidade em estoque <input name="quantidade" value="{{ produto.estoque.consultar_quantidade() if produto else '0' }}"></label>
+  <button>Salvar</button>
+  <a href="/admin/produtos">Voltar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titulo %}Meus pedidos{% endblock %}
+{% block conteudo %}
+<h1>Meus pedidos</h1>
+{% for pedido in pedidos %}
+<div class="cartao">
+  <h3>Pedido nº {{ pedido.id }} <span class="status">{{ pedido.status }}</span></h3>
+  <p class="detalhe">{{ pedido.data.strftime('%d/%m/%Y %H:%M') }}</p>
+  <ul>
+    {% for item in pedido.itens %}
+    <li>{{ item.quantidade }}x {{ item.produto.nome }} — {{ item.calcular_subtotal() | dinheiro }}</li>
+    {% endfor %}
+  </ul>
+  <p class="total">Total: {{ pedido.valor_total | dinheiro }}</p>
+  {% if pedido.entrega %}<p>Rastreio: <b>{{ pedido.entrega.codigo_rastreio }}</b> ({{ pedido.entrega.status }})</p>{% endif %}
+  {% if pedido.status == 'Aguardando pagamento' %}
+  <form method="post" action="/pedido/cancelar">
+    <input type="hidden" name="pedido_id" value="{{ pedido.id }}">
+    <button class="secundario">Cancelar pedido</button>
+  </form>
+  {% endif %}
+</div>
+{% else %}
+<p>Você ainda não fez pedidos.</p>
+{% endfor %}
+{% endblock %}

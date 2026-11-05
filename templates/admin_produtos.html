@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Produtos e estoque{% endblock %}
+{% block conteudo %}
+<h1>Produtos e estoque</h1>
+<form class="busca">
+  <input name="busca" value="{{ busca }}" placeholder="Pesquisar produto...">
+  <button>Pesquisar</button>
+  <a class="botao" href="/admin/produto">+ Novo produto</a>
+</form>
+<table>
+  <tr><th>Nº</th><th>Nome</th><th>Preço</th><th>Estoque</th><th>Situação</th><th></th></tr>
+  {% for produto in produtos %}
+  <tr>
+    <td>{{ produto.id }}</td>
+    <td>{{ produto.nome }}</td>
+    <td>{{ produto.preco | dinheiro }}</td>
+    <td>{{ produto.estoque.consultar_quantidade() }}</td>
+    <td>{{ 'Ativo' if produto.ativo else 'Inativo' }}</td>
+    <td class="acoes">
+      <a class="botao secundario" href="/admin/produto?id={{ produto.id }}">Alterar</a>
+      <form method="post" action="/admin/produto/{{ 'inativar' if produto.ativo else 'ativar' }}">
+        <input type="hidden" name="produto_id" value="{{ produto.id }}">
+        <button class="secundario">{{ 'Inativar' if produto.ativo else 'Reativar' }}</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

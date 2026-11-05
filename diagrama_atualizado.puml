@@ -1,0 +1,137 @@
+@startuml Avenzi
+' Diagrama de classes atualizado após a implementação.
+' Mudanças em relação à Atividade 4 estão marcadas com <<novo>> / comentários.
+skinparam classAttributeIconSize 0
+
+abstract class Usuario {
+  -id: int
+  -nome: String
+  -email: String
+  -senha: String
+  -ativo: boolean
+  +autenticar(email: String, senha: String): boolean
+  +atualizarDados(nome: String, email: String): void
+  +atualizarDados(nome: String, email: String, novaSenha: String): void
+  +{abstract} obterPermissoes(): List<String>
+  +possuiPermissao(permissao: String): boolean
+}
+
+class Cliente {
+  -cpf: String
+  -telefone: String
+  -endereco: String
+  +cadastrar(): void
+  +consultarPedidos(): List<Pedido>
+  +obterCarrinho(): Carrinho
+  +obterPermissoes(): List<String>
+}
+
+class Administrador {
+  +consultarPedidos(pedidos: List<Pedido>): List<Pedido>
+  +consultarEstoque(produtos: List<Produto>): List<Estoque>
+  +obterPermissoes(): List<String>
+}
+
+class Carrinho {
+  -id: int
+  -valorTotal: double
+  +adicionarProduto(produto: Produto): void
+  +adicionarProduto(produto: Produto, quantidade: int): void
+  +removerProduto(produto: Produto): void
+  +calcularTotal(): double
+  +esvaziar(): void
+}
+
+class ItemCarrinho {
+  -quantidade: int
+  -precoUnitario: double
+  +calcularSubtotal(): double
+}
+
+class Pedido {
+  -id: int
+  -data: Date
+  -valorTotal: double
+  -status: String
+  +criar(): void
+  +cancelar(): void
+  +atualizarStatus(status: String): void
+  +calcularTotal(): double
+}
+
+class ItemPedido {
+  -quantidade: int
+  -precoUnitario: double
+  +calcularSubtotal(): double
+}
+
+class Produto {
+  -id: int
+  -nome: String
+  -descricao: String
+  -preco: double
+  -ativo: boolean
+  +cadastrar(): void
+  +alterarDados(nome: String, descricao: String, preco: double): void
+  +inativar(): void
+  +ativar(): void
+  +consultar(): Produto
+}
+
+class Estoque {
+  -id: int
+  -quantidadeDisponivel: int
+  +consultarQuantidade(): int
+  +atualizarQuantidade(quantidade: int): void
+}
+
+class Pagamento {
+  -id: int
+  -valor: double
+  -data: Date
+  -status: String
+  +registrar(): void
+  +atualizarStatus(status: String): void
+}
+
+class Entrega {
+  -id: int
+  -endereco: String
+  -codigoRastreio: String
+  -status: String
+  +registrarEnvio(codigoRastreio: String): void
+  +atualizarStatus(status: String): void
+}
+
+class Loja <<novo>> {
+  +exigirPermissao(usuario: Usuario, permissao: String): void
+  +cadastrarCliente(...): Cliente
+  +autenticar(email: String, senha: String): Usuario
+  +finalizarPedido(cliente: Cliente): Pedido
+  +registrarPagamento(admin: Administrador, pedidoId: int, valor: double): void
+  +enviarPedido(admin: Administrador, pedidoId: int, codigo: String): void
+  +salvar(): void
+}
+
+class Repositorio <<novo>> {
+  -caminhoArquivo: String
+  +salvar(loja: Loja): void
+  +carregar(loja: Loja): boolean
+}
+
+Usuario <|-- Cliente
+Usuario <|-- Administrador
+Cliente "1" -- "0..1" Carrinho : possui
+Cliente "1" -- "0..*" Pedido : realiza
+Carrinho "1" *-- "1..*" ItemCarrinho : contém
+Pedido "1" *-- "1..*" ItemPedido : contém
+ItemCarrinho "*" --> "1" Produto : refere-se a
+ItemPedido "*" --> "1" Produto : refere-se a
+Produto "1" -- "1" Estoque : possui
+Pedido "1" -- "0..1" Pagamento : possui
+Pedido "1" -- "0..1" Entrega : possui
+Loja "1" o-- "0..*" Usuario
+Loja "1" o-- "0..*" Produto
+Loja "1" o-- "0..*" Pedido
+Loja --> Repositorio : usa
+@enduml
