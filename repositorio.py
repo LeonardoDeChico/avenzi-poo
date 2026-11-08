@@ -110,10 +110,8 @@ class Repositorio:
                 cliente = clientes[d["cliente_id"]]
                 itens = [ItemPedido(produtos[i["produto_id"]], i["quantidade"], i["preco_unitario"])
                          for i in d["itens"]]
-                pedido = Pedido(d["id"], cliente, itens)
-                pedido.data = datetime.fromisoformat(d["data"])
-                pedido.valor_total = d["valor_total"]
-                pedido.status = d["status"]
+                pedido = Pedido(d["id"], cliente, itens,
+                                datetime.fromisoformat(d["data"]), d["status"])
                 if d["pagamento"]:
                     pg = d["pagamento"]
                     data = datetime.fromisoformat(pg["data"]) if pg["data"] else None

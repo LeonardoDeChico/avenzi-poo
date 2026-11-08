@@ -61,7 +61,25 @@ No diagrama atualizado (`diagrama_atualizado.puml`) as duas versões aparecem co
 - **Associação**: `Pedido.cliente`, `Cliente.pedidos`, `ItemPedido.produto`, `Produto.estoque`, `Pedido.pagamento` (0..1), `Pedido.entrega` (0..1), `Cliente.carrinho` (0..1).
 
 ### Encapsulamento
-A quantidade do estoque só muda por `Estoque.atualizar_quantidade()`, que não deixa ficar negativa. O status do pedido só muda por `Pedido.atualizar_status()` / `cancelar()`, que conferem a ordem do processo.
+No diagrama os atributos são privados (`-`). No código isso é feito assim:
+
+1. **Atributo privado com `_`**: `self._status`, `self._preco`, `self._quantidade_disponivel`... Em Python o `_` é a convenção para "privado, não mexa de fora da classe".
+2. **Leitura com `@property` (getter)**: de fora dá para **ler** `pedido.status` ou `produto.preco`, como se fosse um atributo comum. As páginas HTML usam isso.
+3. **Sem setter**: tentar **alterar** direto (`pedido.status = "Enviado"`) gera erro (`AttributeError`). Para mudar é obrigatório chamar o método da classe, que **valida antes**:
+
+| Atributo | Só muda por | O que o método garante |
+|---|---|---|
+| `Estoque._quantidade_disponivel` | `atualizar_quantidade()` | nunca fica negativa |
+| `Pedido._status` | `criar()`, `registrar_pagamento()`, `atualizar_status()`, `cancelar()` | ordem do processo, RN05 e RN06 |
+| `Produto._ativo` | `ativar()` / `inativar()` | não ativa duas vezes; RN01 |
+| `Produto._nome`, `_preco` | `alterar_dados()` | nome obrigatório, preço > 0 |
+| `Usuario._nome`, `_email`, `_senha` | `atualizar_dados()` | e-mail válido, senha com 4+ caracteres |
+| `ItemCarrinho._quantidade` | `alterar_quantidade()` | quantidade > 0 |
+| `Usuario._id`, `Produto._id` | `definir_id()` | o id é dado uma única vez, pela `Loja` |
+
+Exemplo para mostrar na apresentação (`modelo/pedido.py`): o status do pedido não pode "pular etapas", porque não existe outro caminho para mudá-lo além de `atualizar_status()`.
+
+As referências dos relacionamentos (`pedido.cliente`, `pedido.itens`, `cliente.pedidos`...) ficaram públicas, porque representam as associações do diagrama e não guardam regra própria.
 
 ## Onde está cada regra de negócio
 
@@ -115,10 +133,32 @@ Por isso as rotas não precisam de `try/except`: as classes lançam (`raise`) e 
 8. Em "Produtos e estoque": cadastrar, alterar, inativar (some da vitrine → RN01).
 9. Fechar e abrir o sistema de novo: os dados continuam lá (persistência).
 
+## Principais telas
+
+Prints da aplicação rodando com dados de exemplo (pasta `telas/`).
+
+| Tela | O que mostra |
+|---|---|
+| ![Vitrine](telas/01-vitrine.png) | **Vitrine (visitante)**: pesquisa de produtos (RF04). Produto inativo não aparece (RN01). |
+| ![Cadastro](telas/02-cadastro.png) | **Criar conta**: cadastro de cliente com validação (RF01). |
+| ![Login](telas/03-login.png) | **Login**: autenticação (RF02, RNF02). |
+| ![Vitrine do cliente](telas/04-vitrine-cliente.png) | **Vitrine (cliente logado)**: adicionar ao carrinho (RF05). Produto sem estoque aparece como "Esgotado". |
+| ![Carrinho](telas/05-carrinho.png) | **Carrinho**: itens, subtotais, total e "Finalizar pedido" (RF06). |
+| ![Meus pedidos](telas/06-meus-pedidos.png) | **Meus pedidos**: o cliente acompanha o status e o rastreio. |
+| ![Pedidos (admin)](telas/07-admin-pedidos.png) | **Pedidos (administrador)**: pagamento → separação → envio → conclusão, com os botões certos para cada status (RF07, RF09, RF10, RN05, RN06). |
+| ![Produtos e estoque](telas/08-admin-produtos.png) | **Produtos e estoque**: listar, alterar, inativar e reativar (RF03, RF08). |
+| ![Formulário de produto](telas/09-admin-produto-form.png) | **Formulário de produto**: alteração de registro. |
+| ![Erro de permissão](telas/10-erro-permissao.png) | **Erro: operação não permitida**: cliente tentando abrir a área do administrador (RN08). |
+| ![Erro de registro](telas/11-erro-registro.png) | **Erro: registro não encontrado**: mensagem amigável, sem detalhe técnico (RNF04). |
+| ![Celular](telas/12-celular.jpg) | **Celular**: layout responsivo (RNF01). |
+
 ## Mudanças em relação ao diagrama da Atividade 4
 
 - `Administrador.consultar_pedidos(pedidos)` e `consultar_estoque(produtos)` passaram a receber a lista por parâmetro.
 - Novo método `Produto.ativar()` (reativar produto inativado).
 - Novos `Usuario.possui_permissao()`, `Cliente.obter_carrinho()` e `Carrinho.esvaziar()`.
+- Novos `Usuario.definir_id()` e `Produto.definir_id()`: o id só é dado depois que os dados foram validados (encapsulamento).
+- Novo `ItemCarrinho.alterar_quantidade()`: a quantidade do item só muda por ele.
+- Novo `Pedido.registrar_pagamento(pagamento)`: o pedido confere o próprio estado antes de aceitar o pagamento (não aceita pagamento de pedido cancelado).
 - Novas classes de apoio: `Loja` (coordena as operações) e `Repositorio` (persistência).
 - O diagrama atualizado está em `diagrama_atualizado.puml`. Para gerar a imagem, cole o conteúdo em https://www.plantuml.com/plantuml.

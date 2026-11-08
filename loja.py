@@ -54,7 +54,7 @@ class Loja:
         cliente.cadastrar()  # valida os dados
         if any(u.email.lower() == email.strip().lower() for u in self.usuarios):
             raise DadosInvalidosError("Já existe um usuário com este e-mail.")
-        cliente.id = self.gerar_id()  # só gera o número depois de validar
+        cliente.definir_id(self.gerar_id())  # só gera o número depois de validar
         self.usuarios.append(cliente)
         self.salvar()
         return cliente
@@ -105,7 +105,7 @@ class Loja:
         self.exigir_permissao(usuario, "GERENCIAR_PRODUTOS")
         produto = Produto(None, nome.strip(), descricao.strip(), preco, quantidade)
         produto.cadastrar()
-        produto.id = produto.estoque.id = self.gerar_id()  # só gera o número depois de validar
+        produto.definir_id(self.gerar_id())  # só gera o número depois de validar
         self.produtos.append(produto)
         self.salvar()
 
@@ -177,10 +177,8 @@ class Loja:
         if round(valor, 2) != round(pedido.valor_total, 2):
             total = f"{pedido.valor_total:.2f}".replace(".", ",")
             raise DadosInvalidosError(f"O valor pago deve ser igual ao total do pedido (R$ {total}).")
-        pagamento = Pagamento(self.gerar_id(), valor)
-        pagamento.registrar()
-        pedido.pagamento = pagamento
-        pedido.atualizar_status(Pedido.PAGO)
+        # o Pedido confere o estado antes de aceitar o pagamento (ex.: pedido cancelado)
+        pedido.registrar_pagamento(Pagamento(self.gerar_id(), valor))
         self.salvar()
 
     def preparar_pedido(self, admin, pedido_id):

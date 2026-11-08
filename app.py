@@ -26,11 +26,15 @@ def usuario_logado():
     return loja.buscar_usuario(id) if id else None
 
 
-def numero_inteiro(campo, nome):
+def converter_inteiro(valor, nome):
     try:
-        return int(request.form.get(campo, ""))
-    except ValueError:
+        return int(valor)
+    except (TypeError, ValueError):
         raise DadosInvalidosError(f'O campo "{nome}" deve ser um número inteiro.')
+
+
+def numero_inteiro(campo, nome):
+    return converter_inteiro(request.form.get(campo, ""), nome)
 
 
 def numero_decimal(campo, nome):
@@ -156,7 +160,7 @@ def admin_produtos():
 def admin_produto_form():
     loja.exigir_permissao(usuario_logado(), "GERENCIAR_PRODUTOS")
     id = request.args.get("id")
-    produto = loja.buscar_produto(int(id)) if id else None
+    produto = loja.buscar_produto(converter_inteiro(id, "Produto")) if id else None
     return render_template("admin_produto_form.html", produto=produto)
 
 
@@ -167,7 +171,7 @@ def admin_produto_salvar():
     preco = numero_decimal("preco", "Preço")
     quantidade = numero_inteiro("quantidade", "Quantidade em estoque")
     if f.get("id"):
-        loja.alterar_produto(usuario, int(f["id"]), f["nome"], f["descricao"], preco, quantidade)
+        loja.alterar_produto(usuario, numero_inteiro("id", "Produto"), f["nome"], f["descricao"], preco, quantidade)
         flash("Produto alterado.", "sucesso")
     else:
         loja.cadastrar_produto(usuario, f["nome"], f["descricao"], preco, quantidade)

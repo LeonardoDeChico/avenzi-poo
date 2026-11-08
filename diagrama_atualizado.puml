@@ -1,6 +1,8 @@
 @startuml Avenzi
 ' Diagrama de classes atualizado após a implementação.
 ' Mudanças em relação à Atividade 4 estão marcadas com <<novo>> / comentários.
+' Encapsulamento: todo atributo marcado com "-" é privado no código (prefixo _)
+' e só pode ser lido de fora (@property); a alteração é feita pelos métodos "+".
 skinparam classAttributeIconSize 0
 
 abstract class Usuario {
@@ -9,6 +11,7 @@ abstract class Usuario {
   -email: String
   -senha: String
   -ativo: boolean
+  +definirId(id: int): void
   +autenticar(email: String, senha: String): boolean
   +atualizarDados(nome: String, email: String): void
   +atualizarDados(nome: String, email: String, novaSenha: String): void
@@ -45,6 +48,7 @@ class Carrinho {
 class ItemCarrinho {
   -quantidade: int
   -precoUnitario: double
+  +alterarQuantidade(quantidade: int): void
   +calcularSubtotal(): double
 }
 
@@ -54,6 +58,7 @@ class Pedido {
   -valorTotal: double
   -status: String
   +criar(): void
+  +registrarPagamento(pagamento: Pagamento): void
   +cancelar(): void
   +atualizarStatus(status: String): void
   +calcularTotal(): double
@@ -71,6 +76,7 @@ class Produto {
   -descricao: String
   -preco: double
   -ativo: boolean
+  +definirId(id: int): void
   +cadastrar(): void
   +alterarDados(nome: String, descricao: String, preco: double): void
   +inativar(): void
