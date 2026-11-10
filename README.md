@@ -161,4 +161,6 @@ Prints da aplicação rodando com dados de exemplo (pasta `telas/`).
 - Novo `ItemCarrinho.alterar_quantidade()`: a quantidade do item só muda por ele.
 - Novo `Pedido.registrar_pagamento(pagamento)`: o pedido confere o próprio estado antes de aceitar o pagamento (não aceita pagamento de pedido cancelado).
 - Novas classes de apoio: `Loja` (coordena as operações) e `Repositorio` (persistência).
-- O diagrama atualizado está em `diagrama_atualizado.puml`. Para gerar a imagem, cole o conteúdo em https://www.plantuml.com/plantuml.
+- O código do diagrama está em `diagrama_atualizado.puml` (PlantUML) e a imagem em `diagrama_atualizado.png`:
+
+![Diagrama de classes atualizado](diagrama_atualizado.png)
